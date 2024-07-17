@@ -1,0 +1,51 @@
+Dont run aws configure with root previlages, it can't able to read
+For some plugins in jenkins need to restart manually--> sudo systemctl restart jenkins
+After running build, we need to delete the workspace for that build  (post --> always --> deleteDir() )
+when is used whether the stage should run or not
+package.json --> Contains dependencies and versions
+
+Build Files --> Contains our project details, name, version, dependencies, description
+---------------
+Java --> maven --> pom.xml
+Python --. pip --> requirements.txt
+NodeJs --> npm --> package.json
+DotNet --> Nuget --> project.json
+
+node_modules: is useful to run our project successfully in backend
+
+NodeJs build file ---> Node js code and node_modules --> then only we can zip to deploy
+every version should have a seperate artifact/zip file / build file (All are same names)
+
+// Variable can be accessed with in that stage only not in other stages
+To use in all stages use -->environment
+
+Git --> is used to store the code (Not zip / exe  / packages / artifact files)
+Nexus --> To store the Artifact,  not for code --> It is aheavy things
+
+Docker Image is a foolish --> It a simple memory application
+
+
+nexus --> 8081 (Port)
+Jenkins --> 8080
+
+
+group id, artifact id , version --> Combination of these 3 we can Identify uniquely modules/artifact's in a project
+
+group id --> com.expense (These are unique) as we expense.com
+artifact id --> backend --> Our repository name
+version --> 1.1.0
+Combination of both (group id + artifact id)  is unique
+
+Like GitHub how we are creating repository and pushing code
+Similarly
+In Nexus create repository and push artifact
+
+In nexus --> Allow redeploy --> Only 1 version in 1 artifact 
+http://44.193.16.140:8081/repository/backend/ --> PUSH repository to this artifact
+
+
+rebuilder --> Plugin --> Again build if fail + takes same previous parameters
+
+Nexus is not a tools it is a utility, here no AGENT unlike Sonar Qube
+
+In Sonar Qube (TOOL) there is a AGENT to send details to Sonar Scanner --> Like Agent in feild and SI (Scanner)

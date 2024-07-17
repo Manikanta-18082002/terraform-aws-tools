@@ -29,20 +29,35 @@ module "jenkins_agent" { # Created Jenkins - Agent instance
   }
 }
 
-# module "nexus" {
-#   source  = "terraform-aws-modules/ec2-instance/aws"
+resource "aws_key_pair" "tools" {
+  key_name   = "tools"
+  # you can paste the public key directly like this
+  #public_key = "ssh-....."
+  public_key = file("C:/devops/.ssh/tools.pub")
+  # ~ means windows home directory
+}
 
-#   name = "nexus"
+module "nexus" { // UBUNTU OS
+  source  = "terraform-aws-modules/ec2-instance/aws"
 
-#   instance_type          = "t3.small"
-#   vpc_security_group_ids = ["sg-0fea5e49e962e81c9"]
-#   # convert StringList to list and get first element
-#   subnet_id = "subnet-0ea509ad4cba242d7"
-#   ami = data.aws_ami.nexus_ami_info.id
-#   tags = {
-#     Name = "nexus"
-#   }
-# }
+  name = "nexus"
+
+  instance_type          = "t3.medium"
+  vpc_security_group_ids = ["sg-00fdfc2b0e8a3e6e9"]
+  # convert StringList to list and get first element
+  subnet_id = "subnet-0e273ca043101f2d5"
+  ami = data.aws_ami.nexus_ami_info.id
+  key_name = aws_key_pair.tools.key_name
+  root_block_device = [
+    {
+      volume_type = "gp3"
+      volume_size = 30
+    }
+  ]
+  tags = {
+    Name = "nexus"
+  }
+} // TO login --> ssh -i /c/devops/.ssh/tools ubuntu@ip | copy path for pass --> Paste --> Enable anonymous access -- exit
 
 module "records" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
@@ -50,7 +65,7 @@ module "records" {
 
   zone_name = var.zone_name
 
-  records = [  # jenkins.dawsmani.site:8080
+  records = [
     {
       name    = "jenkins"
       type    = "A"
@@ -58,6 +73,7 @@ module "records" {
       records = [
         module.jenkins.public_ip
       ]
+      allow_overwrite = true
     },
     {
       name    = "jenkins-agent"
@@ -66,15 +82,18 @@ module "records" {
       records = [
         module.jenkins_agent.private_ip
       ]
+      allow_overwrite = true
     },
-    # {
-    #   name    = "nexus"
-    #   type    = "A"
-    #   ttl     = 1
-    #   records = [
-    #     module.nexus.private_ip
-    #   ]
-    # }
+    {
+      name    = "nexus"
+      type    = "A"
+      ttl     = 1
+      allow_overwrite = true
+      records = [
+        module.nexus.private_ip # Creating a record nexus.dawsmani.site (And giving private IP inside record)
+      ]
+      allow_overwrite = true
+    }
   ]
 
 }
